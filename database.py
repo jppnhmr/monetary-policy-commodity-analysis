@@ -71,17 +71,24 @@ def add_countries():
     add_country('UK', 'United Kingdom', 'GBP')
     add_country('US', 'United States',  'USD')
 
-def add_metrics():
+def add_metric(metric_name, unit):
     conn = connect()
     cur = conn.cursor()
 
-    cur.execute('''
+    cur.execute(f'''
         INSERT OR IGNORE INTO metrics (metric_name, unit)
-        VALUES ('policy interest rate', '%')
+        VALUES ('{metric_name}',
+                '{unit}')
     ''')
 
     conn.commit()
     conn.close()
+
+def add_metrics():
+    add_metric('policy interest rate', '%')
+    add_metric('global energy index', '')
+    add_metric('global all commodities index', '')
+    add_metric('global food index', '')
 
 def add_source(country_code, metric_id, source_name, source_url):
 
@@ -100,9 +107,16 @@ def add_source(country_code, metric_id, source_name, source_url):
 def add_sources():
     add_source('UK', 'policy interest rate', 'Bank of England', 'https://www.bankofengland.co.uk/boeapps/database/')
     add_source('US', 'policy interest rate', 'Federal Reserve Bank of St.Louis', 'https://fred.stlouisfed.org/series/DFF')
+    add_source('NULL', 'global energy index', 'Federal Reserve Bank of St.Louis', 'https://fred.stlouisfed.org/series/DFF')
+    add_source('NULL', 'global all commodities index', 'Federal Reserve Bank of St.Louis', 'https://fred.stlouisfed.org/series/DFF')
+    add_source('NULL', 'global food index', 'Federal Reserve Bank of St.Louis', 'https://fred.stlouisfed.org/series/DFF')
 
 # USE #
-def insert_data(country_id, metric_id, data: List[Dict]):
+def insert_data(country_code, metric_name, data: List[Dict]):
+
+    country_id = get_country_id(country_code)
+    metric_id = get_metric_id(metric_name)
+
     conn = connect()
     cur = conn.cursor()
 
@@ -117,6 +131,10 @@ def insert_data(country_id, metric_id, data: List[Dict]):
     conn.close()
 
 def get_country_id(country_code):
+
+    if country_code == 'NULL':
+        return 'NULL'
+
     conn = connect()
     cur = conn.cursor()
 
@@ -125,7 +143,9 @@ def get_country_id(country_code):
         WHERE country_code = ?
     ''', (country_code,))
 
-    return cur.fetchone()[0]
+    id = cur.fetchone()[0]
+    conn.close()
+    return id
 
 def get_metric_id(metric_name):
     conn = connect()
@@ -136,7 +156,9 @@ def get_metric_id(metric_name):
         WHERE metric_name = ?
     ''', (metric_name,))
 
-    return cur.fetchone()[0]
+    id = cur.fetchone()[0]
+    conn.close()
+    return id
 
 if __name__ == '__main__':
 
