@@ -73,7 +73,7 @@ def collect_fred_data():
     insert_data('NULL','global food index', extract_data(response.text))
 
 if __name__ == "__main__":
-    print('----- Collecting Data: \t\tRunning -----', end='\r')
+    print('----- Collecting Data: Running -----', end='\r')
     collect_boe_data()
     collect_fred_data() 
-    print('----- Collecting Data: \t\tDone -----')
+    print('----- Collecting Data: Done -----')

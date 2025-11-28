@@ -111,25 +111,6 @@ def add_sources():
     add_source('NULL', 'global all commodities index', 'Federal Reserve Bank of St.Louis', 'https://fred.stlouisfed.org/series/DFF')
     add_source('NULL', 'global food index', 'Federal Reserve Bank of St.Louis', 'https://fred.stlouisfed.org/series/DFF')
 
-# USE #
-def insert_data(country_code, metric_name, data: List[Dict]):
-
-    country_id = get_country_id(country_code)
-    metric_id = get_metric_id(metric_name)
-
-    conn = connect()
-    cur = conn.cursor()
-
-    for record in data:
-        cur.execute('''
-            INSERT OR IGNORE INTO data_points (country_id, metric_id, date, value)
-            VALUES (?, ?, ?, ?)
-        ''', 
-        (country_id, metric_id, record['date'], record['value']))
-
-    conn.commit()
-    conn.close()
-
 def get_country_id(country_code):
 
     if country_code == 'NULL':
@@ -159,6 +140,25 @@ def get_metric_id(metric_name):
     id = cur.fetchone()[0]
     conn.close()
     return id
+
+# USE #
+def insert_data(country_code, metric_name, data: List[Dict]):
+
+    country_id = get_country_id(country_code)
+    metric_id = get_metric_id(metric_name)
+
+    conn = connect()
+    cur = conn.cursor()
+
+    for record in data:
+        cur.execute('''
+            INSERT OR IGNORE INTO data_points (country_id, metric_id, date, value)
+            VALUES (?, ?, ?, ?)
+        ''', 
+        (country_id, metric_id, record['date'], record['value']))
+
+    conn.commit()
+    conn.close()
 
 if __name__ == '__main__':
 
