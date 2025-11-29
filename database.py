@@ -131,7 +131,6 @@ def insert_data(country_code, metric_name, data: List[Dict]):
     conn.close()
 
 # GET #
-
 def get_country_id(country_code):
 
     if country_code == 'NULL':
@@ -162,9 +161,19 @@ def get_metric_id(metric_name):
     conn.close()
     return id
 
+def select(cols, table):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(f'''
+        SELECT {cols} FROM {table}
+    ''')
+
+    return cur.fetchall()
+
 if __name__ == '__main__':
 
-    print('----- Database Setup -----', end='\r')
+    print('----- Database Setup: Running -----', end='\r')
     # create
     create_tables()
     # populate
