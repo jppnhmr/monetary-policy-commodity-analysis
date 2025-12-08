@@ -59,10 +59,10 @@ def create_tables():
 def add_country(country_code, country_name, currency_code):
     conn = connect()
     cur = conn.cursor()
-    cur.execute(f'''
+    cur.execute('''
         INSERT OR IGNORE INTO countries (country_code, country_name, currency_code)
         VALUES (?, ?, ?)    
-    ''', country_code, country_name, currency_code)
+    ''', (country_code, country_name, currency_code))
     conn.commit()
     conn.close()
 
@@ -165,6 +165,29 @@ def select(cols, table):
     cur.execute(f'''
         SELECT {cols} FROM {table}
     ''')
+
+    return cur.fetchall()
+
+def get_data_country_metric(country_id: str, metric_id: str):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute('''
+    SELECT date, value FROM  data_points
+    WHERE country_id = ? AND metric_id = ?
+    ''', (country_id, metric_id))
+
+    return cur.fetchall()
+
+def get_data_country_metric_latest(country_id: str, metric_id: str):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute('''
+    SELECT date, value FROM  data_points
+    WHERE country_id = ? AND metric_id = ?
+    ORDER BY date DESC LIMIT 1
+    ''', (country_id, metric_id))
 
     return cur.fetchall()
 

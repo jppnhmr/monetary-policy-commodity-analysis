@@ -7,7 +7,11 @@ from database import get_country_id, get_metric_id, insert_data
 # Util
 def extract_data(text):
     data = []
-    for line in text.splitlines():
+    lines = text.splitlines()
+    # check for header
+    l1 = lines[0].strip().lower()
+    start = 1 if 'date' in l1 or 'value' in l1 else 0
+    for line in lines[start:]:
         item = line.strip().split(',')
         data.append({'date': item[0].strip(), 'value': item[1].strip()})
     return data

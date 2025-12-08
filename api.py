@@ -26,3 +26,25 @@ def metrics():
         metrics.append(item[0])
 
     return metrics
+
+@app.get("/data/{country}/{metric}")
+def get_country_metric_data(country: str, metric: str):
+    country_id = db.get_country_id(country)
+    metric_id = db.get_metric_id(metric)
+
+    data = db.get_data_country_metric(
+        country_id=country_id, 
+        metric_id=metric_id)
+    
+    return data
+
+@app.get("/data/{country}/{metric}/latest")
+def get_country_metric_data_latest(country: str, metric: str):
+    country_id = db.get_country_id(country)
+    metric_id = db.get_metric_id(metric)
+
+    data = db.get_data_country_metric_latest(
+        country_id=country_id, 
+        metric_id=metric_id)
+    
+    return data
