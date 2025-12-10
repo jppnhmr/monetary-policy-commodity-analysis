@@ -159,16 +159,6 @@ def get_metric_id(metric_name):
     conn.close()
     return id
 
-def select(cols, table):
-    conn = connect()
-    cur = conn.cursor()
-
-    cur.execute(f'''
-        SELECT {cols} FROM {table}
-    ''')
-
-    return cur.fetchall()
-
 def get_data_country_metric(country_id: str, metric_id: str):
     conn = connect()
     cur = conn.cursor()
@@ -202,6 +192,34 @@ def get_data_global_metric(metric_id: str):
     ''', (metric_id,))
 
     return cur.fetchall()
+
+def get_countires():
+    conn = connect()
+    cur = conn.cursor()
+
+    query = '''
+    SELECT country_code, country_name
+    FROM countries
+    '''
+    cur.execute(query)
+
+    data = cur.fetchall()
+    conn.close()
+    return data
+
+def get_metrics():
+    conn = connect()
+    cur = conn.cursor()
+
+    query = '''
+    SELECT metric_name
+    FROM metrics
+    '''
+    cur.execute(query)
+
+    data = cur.fetchall()
+    conn.close()
+    return data
 
 if __name__ == '__main__':
     # Remove old database
