@@ -6,12 +6,12 @@ from typing import List
 import database as db
 
 # Make a graph of List[(x_values, y_values)]
-def plot_data(data: List[tuple]):
+def plot_data(data: List[tuple], title, y_axis):
     df = pd.DataFrame(data).rename(columns={0: 'date', 1: 'value'})
 
-    df.plot(kind='line', x='date', y='value')
+    df.plot(kind='line', x='date', y='value', title=title)
     plt.axes
-    plt.ylabel = 'value'
+    plt.ylabel = y_axis
     plt.xlabel = 'date'
     plt.show()
 
@@ -53,7 +53,8 @@ def cli_plot_data():
             db.get_metric_id(metric))
         
     # Plot Data
-    plot_data(data)
+    title = f'{metric}' if is_global else f"{country} {metric}"
+    plot_data(data, title, y_axis=metric)
 
     print('##### Done #####')
 
