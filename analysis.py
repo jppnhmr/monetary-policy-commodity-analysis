@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from matplotlib.widgets import Cursor
 import pandas as pd
+import numpy as np
+from datetime import datetime
 
 from typing import List
 
@@ -7,10 +11,23 @@ import database as db
 
 # Make a graph of List[(x_values, y_values)]
 def plot_data(data: List[tuple], title, y_axis):
-    df = pd.DataFrame(data).rename(columns={0: 'date', 1: 'value'})
+    dates = []
+    values = []
+    for d in data:
+        dates.append(datetime.strptime(d[0],'%Y-%m-%d'))
+        values.append(d[1])
 
-    df.plot(kind='line', x='date', y='value', title=title)
-    plt.axes
+    fig, ax = plt.subplots()
+    ax.plot(dates, values)
+    ax.grid(True)
+
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_minor_locator(mdates.MonthLocator(interval=2))
+
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
     plt.ylabel = y_axis
     plt.xlabel = 'date'
     plt.show()
