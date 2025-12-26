@@ -19,8 +19,12 @@ Python API that collects, stores and provides data on various financial data set
 
 ## Usage
 Setup database and collect data
-> python run.py
+> python -m src.run
 
 Create graph of data
 
-> python analysis.py
+> python -m src.analysis
+
+Run API
+
+> uvicorn src.api:app --reload
