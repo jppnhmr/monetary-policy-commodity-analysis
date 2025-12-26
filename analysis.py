@@ -37,6 +37,8 @@ def plot_data(data: List[tuple], title, y_axis, y_unit):
 
     plt.ylabel(y_axis)
     plt.xlabel('date')
+
+    plt.title(title)
     plt.show()
 
 def cli_plot_data():
