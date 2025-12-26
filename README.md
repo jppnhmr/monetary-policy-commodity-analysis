@@ -18,11 +18,8 @@ Python API that collects, stores and provides data on various financial data set
 > pip install -r requirements.txt
 
 ## Usage
-Setup database
-> python database.py
-
-Collect data
-> python collection.py
+Setup database and collect data
+> python run.py
 
 Create graph of data
 

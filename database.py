@@ -236,7 +236,7 @@ def get_metric_unit(metric_name):
     conn.close()
     return data
 
-if __name__ == '__main__':
+def run():
     # Remove old database
     if os.path.exists('finance_data.db'):
         os.remove('finance_data.db')
@@ -249,3 +249,7 @@ if __name__ == '__main__':
     add_metrics()
     add_sources()
     print('----- Database Setup: Done -----')
+
+
+if __name__ == '__main__':
+    run()
