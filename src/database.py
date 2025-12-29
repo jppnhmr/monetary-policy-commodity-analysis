@@ -191,7 +191,9 @@ def get_data_global_metric(metric_id: str):
     WHERE metric_id = ?
     ''', (metric_id,))
 
-    return cur.fetchall()
+    data = cur.fetchall()
+    conn.close()
+    return data
 
 def get_countires():
     conn = connect()

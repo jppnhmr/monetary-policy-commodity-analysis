@@ -41,6 +41,45 @@ def plot_data(data: List[tuple], title, y_axis, y_unit):
     plt.title(title)
     plt.show()
 
+def plot_multi_data(datas: List[List[tuple]], title, y_axis, y_unit):
+    
+    lines = []
+    for data in datas:
+        line = []
+        for row in data:
+            date = datetime.strptime(row[0],'%Y-%m-%d')
+            value = row[1]
+            line.append((date,value))
+        lines.append(line)
+
+    fig, ax = plt.subplots(figsize=(10,6))
+    for line in lines:
+        dates = [point[0] for point in line]
+        values = [point[1] for point in line]
+        ax.plot(dates, values)
+    ax.grid(True)
+
+    # Major tick per year, Minor tick per month
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_minor_locator(mdates.MonthLocator(interval=2))
+
+    # Minor ticks evenly spaced
+    all_values = [point[1] for line in lines for point in line]
+    y_min = np.min(all_values)
+    y_max = np.max(all_values)
+    ax.set_ylim(y_min, y_max)
+    ax.yaxis.set_major_locator(MaxNLocator(nbins='auto',steps=[5]))
+
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.ylabel(y_axis)
+    plt.xlabel('date')
+
+    plt.title(title)
+    plt.show()
+
 def cli_plot_data():
     print('##### Plot Data #####')
 
