@@ -239,8 +239,8 @@ def get_metric_unit(metric_name):
     conn.close()
     return data
 
-# DataFrames #
-def get_df(metric_name: str, country_name: Optional[str] = None) -> pd.DataFrame:
+# Series #
+def get_series(metric_name: str, country_name: Optional[str] = None) -> pd.Series:
     
     metric_id = get_metric_id(metric_name)
     
@@ -252,8 +252,8 @@ def get_df(metric_name: str, country_name: Optional[str] = None) -> pd.DataFrame
         data = get_data_global_metric(metric_id)
 
     df = pd.Series(
-        dict(data),
-        index = [date for date, value in data]
+        data=[value for date, value in data],
+        index=pd.to_datetime([date for date, value in data])
     )
 
     return df
