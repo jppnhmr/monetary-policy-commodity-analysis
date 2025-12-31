@@ -231,6 +231,16 @@ def cli_plot_data():
 
     print('##### Done #####')
 
+def plot_rolling_corr(datas: Dict[str, pd.Series], window: int, pir: str, idx: str):
+    rolling_corr = datas[pir].rolling(window=window).corr(datas[idx])
+
+    plt.figure(figsize=(10,4))
+    plt.plot(rolling_corr,color='purple')
+    plt.title(f"{str(window)}-Month Rolling Correlation: {pir} Rates vs {idx} Index")
+    plt.axhline(0, color='black', linestyle='--')
+    plt.show()
+
+
 # Analysis #
 def analysis():
     datas = get_all_datas()
@@ -246,9 +256,18 @@ def analysis():
         # Resample to Month Start
         datas[col] = daily_series.resample('MS').mean()
 
-    plot_datas(datas, 
+    # Forward sample All Commodities (from quaterly to monthly)
+    datas['All Commodities'] = datas['All Commodities'].resample('MS').ffill()
+
+    plot_datas(
+        datas = datas, 
         pir_cols = ['UK','US'], 
-        idx_cols = ['Food', 'Energy', 'All Commodities'])
+        idx_cols = ['Food', 'Energy', 'All Commodities']
+    )
+
+    plot_rolling_corr(datas, 36, 'US', 'Energy')
+    plot_rolling_corr(datas, 36, 'US', 'Food')
+    plot_rolling_corr(datas, 36, 'US', 'All Commodities')
 
 
 if __name__ == "__main__":
