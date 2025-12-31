@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import src.database as db
 
@@ -154,7 +154,9 @@ def plot_interest_against_index(pir_datas: List[List[tuple]],
 
     plt.show()
 
-def plot_datas(datas: Dict[str,pd.Series], pir_cols: List[str], idx_cols: List[str]):
+def plot_datas(datas: Dict[str,pd.Series], 
+            pir_cols: List[str], idx_cols: List[str],
+            v_shading: Optional[List[tuple]] = None):
 
     fig, ax1 = plt.subplots(figsize=(10,6))
     ax2 = ax1.twinx()
@@ -162,23 +164,29 @@ def plot_datas(datas: Dict[str,pd.Series], pir_cols: List[str], idx_cols: List[s
     idx_colors = plt.cm.Reds(np.linspace(0.4, 0.9, len(idx_cols)))
     pir_colors = plt.cm.Blues(np.linspace(0.4, 0.9, len(pir_cols)))
 
-    lines = []
+    elements = []
 
     for i, col in enumerate(idx_cols):
         ln = ax2.plot(datas[col].index, datas[col], label=col+' Index', color=idx_colors[i])
-        lines += ln   
+        elements += ln   
 
     for i, col in enumerate(pir_cols):
         ln = ax1.plot(datas[col].index, datas[col], label=col+' Interest Rate', color=pir_colors[i])
-        lines += ln
+        elements += ln
+
+    if v_shading:
+        for start, end, label in v_shading:
+            patch = ax1.axvspan(pd.to_datetime(start), pd.to_datetime(end),
+                        color='gray', alpha=0.2, label=label)
+            elements.append(patch)
 
     ax1.set_xlabel('Year')
     ax1.set_ylabel('Interest Rate (%)', color='tab:blue', fontweight='bold')
     ax2.set_ylabel('Index Values', color='tab:red', fontweight='bold')
     plt.title('Policy Interest Rates vs Indices',fontsize=14)
 
-    labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc='upper left', frameon=True, fontsize='small')
+    labs = [l.get_label() for l in elements]
+    ax1.legend(elements, labs, loc='upper left', frameon=True, fontsize='small')
 
     ax1.grid(True, which='major', axis='both', alpha=0.3)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
@@ -234,10 +242,12 @@ def cli_plot_data():
 def plot_rolling_corr(datas: Dict[str, pd.Series], window: int, pir: str, idx: str):
     rolling_corr = datas[pir].rolling(window=window).corr(datas[idx])
 
-    plt.figure(figsize=(10,4))
-    plt.plot(rolling_corr,color='purple')
-    plt.title(f"{str(window)}-Month Rolling Correlation: {pir} Rates vs {idx} Index")
-    plt.axhline(0, color='black', linestyle='--')
+    fig, ax = plt.subplots(figsize=(10,4))
+    ax.plot(rolling_corr,color='purple')
+    ax.set_title(f"{window}-Month Rolling Correlation: {pir} Rates vs {idx} Index")
+    ax.set_ylim([-1.1,1.1])
+    ax.axhline(0, color='black', linestyle='--')
+
     plt.show()
 
 
@@ -259,10 +269,17 @@ def analysis():
     # Forward sample All Commodities (from quaterly to monthly)
     datas['All Commodities'] = datas['All Commodities'].resample('MS').ffill()
 
+    # Vertical Shading for recessions.
+    recessions = [
+        ('2007-12-01', '2009-06-01', 'Great Recession'),
+        ('2020-02-01', '2020-04-01', 'COVID-19')
+    ]
+
     plot_datas(
         datas = datas, 
         pir_cols = ['UK','US'], 
-        idx_cols = ['Food', 'Energy', 'All Commodities']
+        idx_cols = ['Food', 'Energy', 'All Commodities'],
+        v_shading= recessions
     )
 
     plot_rolling_corr(datas, 36, 'US', 'Energy')
